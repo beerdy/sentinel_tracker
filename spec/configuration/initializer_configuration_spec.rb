@@ -1,4 +1,4 @@
-require_relative "../spec_helper"
+require_relative "../../spec_helper"
 
 RSpec.describe SentinelTracker::InitializerConfiguration do
   subject(:call_initializer_configuration) do

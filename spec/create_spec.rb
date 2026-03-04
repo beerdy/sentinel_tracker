@@ -1,4 +1,4 @@
-require_relative "../../spec_helper"
+require_relative "../spec_helper"
 
 RSpec.describe SentinelTracker::SecurityEvents::Create do
   subject(:use_case) do

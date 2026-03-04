@@ -1,4 +1,4 @@
-require_relative "../spec_helper"
+require_relative "../../spec_helper"
 
 RSpec.describe SentinelTracker::SecurityEventEnrichmentRegistry do
   let(:configuration) { SentinelTracker::Configuration.new }
