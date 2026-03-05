@@ -67,7 +67,8 @@ module SentinelTracker
           security_event_id: security_event_id,
           provider_name: result[:provider_name],
           status: result[:network_telemetry_status],
-          output: result[:network_telemetry_output]
+          output: result[:network_telemetry_output],
+          payload: result[:payload]
         )
         log_result(security_event_id: security_event_id, result: result)
         result

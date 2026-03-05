@@ -24,6 +24,11 @@ RSpec.describe SentinelTracker::Configuration do
     expect(configuration.security_event_enrichment_provider_options).to eq({})
   end
 
+  it "имеет настройки client device enrichment по умолчанию" do
+    expect(configuration.client_device_enrichment_provider_name).to eq("user_agent_parser")
+    expect(configuration.client_device_enrichment_provider_options).to eq({})
+  end
+
   it "имеет настройки network telemetry по умолчанию" do
     expect(configuration.network_telemetry_provider_names).to eq(["local_traceroute", "globalping"])
     expect(configuration.network_telemetry_provider_options).to eq({})

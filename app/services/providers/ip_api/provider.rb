@@ -56,7 +56,12 @@ module SentinelTracker
             isp: payload["isp"],
             proxy: payload["proxy"],
             country: payload["country"],
-            city: payload["city"]
+            city: payload["city"],
+            payload: {
+              provider_name: provider_name,
+              response_status: payload["status"],
+              response_message: payload["message"]
+            }.compact
           }
         end
       end

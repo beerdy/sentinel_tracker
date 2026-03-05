@@ -39,6 +39,9 @@ module SentinelTracker
       # @param payload [Hash]
       # @return [Hash]
       def build_attributes(payload)
+        enrichment_attributes = pipeline.call(payload: payload)
+        params_json_patch = enrichment_attributes.delete(:params_json_patch)
+
         {
           target_user_id: payload[:target_user_id],
           target_login: payload[:target_login],
@@ -48,9 +51,36 @@ module SentinelTracker
           ip: payload[:ip],
           x_forwarded_for: payload[:x_forwarded_for],
           user_agent: payload[:user_agent],
-          params_json: payload[:params],
+          params_json: build_params_json(payload_params: payload[:params], params_json_patch: params_json_patch),
           network_telemetry_status: "pending"
-        }.merge(pipeline.call(payload: payload))
+        }.merge(enrichment_attributes)
+      end
+
+      ##
+      # @param payload_params [Hash, nil]
+      # @param params_json_patch [Hash, nil]
+      # @return [Hash]
+      def build_params_json(payload_params:, params_json_patch:)
+        base = payload_params.is_a?(Hash) ? payload_params : {}
+        return base unless params_json_patch.is_a?(Hash)
+
+        deep_merge_hash(base, params_json_patch)
+      end
+
+      ##
+      # @param base [Hash]
+      # @param patch [Hash]
+      # @return [Hash]
+      def deep_merge_hash(base, patch)
+        base.each_with_object({}) { |(key, value), result| result[key] = value }.tap do |result|
+          patch.each do |key, value|
+            if result[key].is_a?(Hash) && value.is_a?(Hash)
+              result[key] = deep_merge_hash(result[key], value)
+            else
+              result[key] = value
+            end
+          end
+        end
       end
 
       ##

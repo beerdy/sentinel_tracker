@@ -7,6 +7,7 @@ module SentinelTracker
         TRACEROUTE_QUERY_COUNT = "1".freeze
         TRACEROUTE_MAX_TTL = "8".freeze
         DEFAULT_COMMAND_PATH = "/usr/sbin/traceroute".freeze
+        FALLBACK_COMMAND_PATHS = ["/usr/sbin/traceroute", "/usr/bin/traceroute", "/bin/traceroute"].freeze
 
         ##
         # @return [String]
@@ -24,11 +25,12 @@ module SentinelTracker
         # @return [Array<String>, nil]
         def call(ip:)
           return if ip.nil?
-          return unless executable_command?
+          command_path = resolved_command_path
+          return if command_path.nil?
           return unless SentinelTracker::Shared::PublicIpGuard.public?(ip: ip)
 
           [
-            traceroute_command_path,
+            command_path,
             "-q", TRACEROUTE_QUERY_COUNT,
             "-m", TRACEROUTE_MAX_TTL,
             ip
@@ -37,9 +39,10 @@ module SentinelTracker
         private
 
         ##
-        # @return [Boolean]
-        def executable_command?
-          File.executable?(traceroute_command_path)
+        # @return [String, nil]
+        def resolved_command_path
+          candidates = [traceroute_command_path, *FALLBACK_COMMAND_PATHS].compact.uniq
+          candidates.find { |command_path| File.executable?(command_path) }
         end
       end
     end

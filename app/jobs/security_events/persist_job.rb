@@ -40,7 +40,7 @@ module SentinelTracker
       ##
       # @return [SentinelTracker::SecurityEvents::Pipeline]
       def pipeline
-        SentinelTracker::SecurityEvents::Pipeline.new(enrichers: [metadata_enricher])
+        SentinelTracker::SecurityEvents::Pipeline.new(enrichers: [metadata_enricher, client_device_enricher])
       end
 
       ##
@@ -50,11 +50,26 @@ module SentinelTracker
       end
 
       ##
+      # @return [SentinelTracker::SecurityEvents::ClientDeviceEnricher]
+      def client_device_enricher
+        SentinelTracker::SecurityEvents::ClientDeviceEnricher.new(provider: client_device_enrichment_provider)
+      end
+
+      ##
       # @return [Object]
       def security_event_enrichment_provider
         SentinelTracker::SecurityEventEnrichmentRegistry.build(
           configuration: configuration,
           provider_name: configuration.security_event_enrichment_provider_name
+        )
+      end
+
+      ##
+      # @return [Object]
+      def client_device_enrichment_provider
+        SentinelTracker::ClientDeviceEnrichmentRegistry.build(
+          configuration: configuration,
+          provider_name: configuration.client_device_enrichment_provider_name
         )
       end
 

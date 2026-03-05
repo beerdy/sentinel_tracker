@@ -24,6 +24,7 @@ module SentinelTracker
       apply_base_settings
       apply_target_matching_settings
       apply_security_event_enrichment_settings
+      apply_client_device_enrichment_settings
       apply_network_telemetry_settings
       configuration
     end
@@ -60,6 +61,13 @@ module SentinelTracker
     end
 
     ##
+    # @return [void]
+    def apply_client_device_enrichment_settings
+      configuration.client_device_enrichment_provider_name = environment.fetch("SENTINEL_TRACKER_CLIENT_DEVICE_ENRICHMENT_PROVIDER", "user_agent_parser")
+      configuration.client_device_enrichment_provider_options = build_client_device_enrichment_provider_options
+    end
+
+    ##
     # @return [Array<String>]
     def network_telemetry_provider_names
       environment.fetch("SENTINEL_TRACKER_NETWORK_TELEMETRY_PROVIDERS", "local_traceroute,globalping").split(",").map(&:strip).reject(&:empty?)
@@ -93,6 +101,19 @@ module SentinelTracker
           "measurement_type" => environment.fetch("SENTINEL_TRACKER_GLOBALPING_MEASUREMENT_TYPE", "traceroute"),
           "poll_interval_seconds" => environment.fetch("SENTINEL_TRACKER_GLOBALPING_POLL_INTERVAL_SECONDS", "1").to_i,
           "max_polls" => environment.fetch("SENTINEL_TRACKER_GLOBALPING_MAX_POLLS", "10").to_i
+        }
+      }
+    end
+
+    ##
+    # @return [Hash]
+    def build_client_device_enrichment_provider_options
+      {
+        "user_agent_parser" => {
+          "max_user_agent_length" => environment.fetch("SENTINEL_TRACKER_USER_AGENT_MAX_LENGTH", "2000").to_i
+        },
+        "client_payload" => {
+          "max_string_length" => environment.fetch("SENTINEL_TRACKER_CLIENT_DEVICE_MAX_STRING_LENGTH", "200").to_i
         }
       }
     end

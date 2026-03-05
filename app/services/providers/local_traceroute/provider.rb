@@ -29,7 +29,10 @@ module SentinelTracker
           return skipped_result unless command
 
           network_telemetry_command_runner.call(command: command).merge(
-            provider_name: provider_name
+            provider_name: provider_name,
+            payload: {
+              command: command
+            }
           )
         end
 
@@ -47,7 +50,10 @@ module SentinelTracker
           {
             network_telemetry_status: "skipped",
             network_telemetry_output: "network telemetry command unavailable for current environment",
-            provider_name: provider_name
+            provider_name: provider_name,
+            payload: {
+              reason: "command_unavailable"
+            }
           }
         end
       end

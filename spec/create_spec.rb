@@ -71,4 +71,32 @@ RSpec.describe SentinelTracker::SecurityEvents::Create do
       )
     )
   end
+
+  it "добавляет client_device в params_json через params_json_patch" do
+    allow(pipeline).to receive(:call).with(payload: payload).and_return(
+      params_json_patch: {
+        "client_device" => {
+          "device_type" => "desktop",
+          "os_name" => "macos",
+          "browser_name" => "chrome"
+        }
+      }
+    )
+    allow(security_event_repository).to receive(:create!).and_return(:created)
+
+    use_case.call(payload: payload)
+
+    expect(security_event_repository).to have_received(:create!).with(
+      attributes: hash_including(
+        params_json: {
+          "login" => { "user" => "watch@example.com" },
+          "client_device" => {
+            "device_type" => "desktop",
+            "os_name" => "macos",
+            "browser_name" => "chrome"
+          }
+        }
+      )
+    )
+  end
 end

@@ -31,7 +31,11 @@ RSpec.describe SentinelTracker::Providers::IpApi::Provider do
       isp: "Google LLC",
       proxy: true,
       country: "United States",
-      city: "Mountain View"
+      city: "Mountain View",
+      payload: {
+        provider_name: "ip_api",
+        response_status: "success"
+      }
     )
   end
 

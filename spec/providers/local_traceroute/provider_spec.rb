@@ -21,7 +21,8 @@ RSpec.describe SentinelTracker::Providers::LocalTraceroute::Provider do
     expect(provider.call(ip: "8.8.8.8")).to eq(
       network_telemetry_status: "completed",
       network_telemetry_output: "hop1\nhop2",
-      provider_name: "local_traceroute"
+      provider_name: "local_traceroute",
+      payload: { command: ["/usr/sbin/traceroute", "8.8.8.8"] }
     )
   end
 
@@ -31,7 +32,8 @@ RSpec.describe SentinelTracker::Providers::LocalTraceroute::Provider do
     expect(provider.call(ip: "8.8.8.8")).to eq(
       network_telemetry_status: "skipped",
       network_telemetry_output: "network telemetry command unavailable for current environment",
-      provider_name: "local_traceroute"
+      provider_name: "local_traceroute",
+      payload: { reason: "command_unavailable" }
     )
   end
 end

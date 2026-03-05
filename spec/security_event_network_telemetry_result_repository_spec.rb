@@ -13,17 +13,20 @@ RSpec.describe SentinelTracker::SecurityEventNetworkTelemetryResultRepository do
     ).and_return(record)
     allow(record).to receive(:status=)
     allow(record).to receive(:output=)
+    allow(record).to receive(:payload=)
     allow(record).to receive(:save!)
 
     result = repository.save_result!(
       security_event_id: 15,
       provider_name: "globalping",
       status: "completed",
-      output: "trace"
+      output: "trace",
+      payload: { "measurement_id" => "m1" }
     )
 
     expect(record).to have_received(:status=).with("completed")
     expect(record).to have_received(:output=).with("trace")
+    expect(record).to have_received(:payload=).with({ "measurement_id" => "m1" })
     expect(record).to have_received(:save!)
     expect(result).to eq(record)
   end

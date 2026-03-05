@@ -18,4 +18,20 @@ RSpec.describe SentinelTracker::SecurityEvents::Pipeline do
       country: "United States"
     )
   end
+
+  it "глубоко объединяет вложенные hash поля" do
+    allow(first_enricher).to receive(:call).with(payload: payload).and_return(
+      params_json_patch: { "security_event_enrichment" => { "provider_name" => "ip_api" } }
+    )
+    allow(second_enricher).to receive(:call).with(payload: payload).and_return(
+      params_json_patch: { "client_device" => { "device_type" => "desktop" } }
+    )
+
+    expect(pipeline.call(payload: payload)).to eq(
+      params_json_patch: {
+        "security_event_enrichment" => { "provider_name" => "ip_api" },
+        "client_device" => { "device_type" => "desktop" }
+      }
+    )
+  end
 end

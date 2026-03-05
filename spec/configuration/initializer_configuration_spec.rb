@@ -15,6 +15,9 @@ RSpec.describe SentinelTracker::InitializerConfiguration do
       "SENTINEL_TRACKER_IP_API_URL" => "http://ip-api.example.test",
       "SENTINEL_TRACKER_IP_API_OPEN_TIMEOUT" => "3",
       "SENTINEL_TRACKER_IP_API_READ_TIMEOUT" => "4",
+      "SENTINEL_TRACKER_CLIENT_DEVICE_ENRICHMENT_PROVIDER" => "user_agent_parser",
+      "SENTINEL_TRACKER_USER_AGENT_MAX_LENGTH" => "1800",
+      "SENTINEL_TRACKER_CLIENT_DEVICE_MAX_STRING_LENGTH" => "220",
       "SENTINEL_TRACKER_NETWORK_TELEMETRY_PROVIDERS" => "local_traceroute,globalping",
       "SENTINEL_TRACKER_TRACEROUTE_COMMAND_PATH" => "/usr/local/bin/traceroute",
       "SENTINEL_TRACKER_REVERSE_PATH_TIMEOUT_SECONDS" => "20",
@@ -67,6 +70,20 @@ RSpec.describe SentinelTracker::InitializerConfiguration do
         "measurement_type" => "mtr",
         "poll_interval_seconds" => 2,
         "max_polls" => 11
+      }
+    )
+  end
+
+  it "применяет client device enrichment настройки" do
+    call_initializer_configuration
+
+    expect(configuration.client_device_enrichment_provider_name).to eq("user_agent_parser")
+    expect(configuration.client_device_enrichment_provider_options).to eq(
+      "user_agent_parser" => {
+        "max_user_agent_length" => 1800
+      },
+      "client_payload" => {
+        "max_string_length" => 220
       }
     )
   end

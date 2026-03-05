@@ -23,7 +23,8 @@ RSpec.describe SentinelTracker::SecurityEvents::TelemetryCollector do
     allow(network_telemetry_provider).to receive(:call).with(ip: "8.8.8.8").and_return(
       network_telemetry_status: "completed",
       network_telemetry_output: "hop1\nhop2",
-      provider_name: "local_traceroute"
+      provider_name: "local_traceroute",
+      payload: { command: ["/usr/sbin/traceroute", "8.8.8.8"] }
     )
     allow(security_event_network_telemetry_result_repository).to receive(:save_result!)
     allow(security_event_repository).to receive(:update_network_telemetry_summary!)
@@ -34,7 +35,8 @@ RSpec.describe SentinelTracker::SecurityEvents::TelemetryCollector do
       security_event_id: 11,
       provider_name: "local_traceroute",
       status: "completed",
-      output: "hop1\nhop2"
+      output: "hop1\nhop2",
+      payload: { command: ["/usr/sbin/traceroute", "8.8.8.8"] }
     )
     expect(security_event_repository).to have_received(:update_network_telemetry_summary!).with(
       security_event_id: 11,
@@ -48,7 +50,8 @@ RSpec.describe SentinelTracker::SecurityEvents::TelemetryCollector do
     allow(network_telemetry_provider).to receive(:call).with(ip: "8.8.8.8").and_return(
       network_telemetry_status: "skipped",
       network_telemetry_output: "network telemetry command unavailable for current environment",
-      provider_name: "local_traceroute"
+      provider_name: "local_traceroute",
+      payload: { reason: "command_unavailable" }
     )
     allow(security_event_network_telemetry_result_repository).to receive(:save_result!)
     allow(security_event_repository).to receive(:update_network_telemetry_summary!)
@@ -59,7 +62,8 @@ RSpec.describe SentinelTracker::SecurityEvents::TelemetryCollector do
       security_event_id: 11,
       provider_name: "local_traceroute",
       status: "skipped",
-      output: "network telemetry command unavailable for current environment"
+      output: "network telemetry command unavailable for current environment",
+      payload: { reason: "command_unavailable" }
     )
     expect(security_event_repository).to have_received(:update_network_telemetry_summary!).with(
       security_event_id: 11,
@@ -73,12 +77,14 @@ RSpec.describe SentinelTracker::SecurityEvents::TelemetryCollector do
     allow(network_telemetry_provider).to receive(:call).with(ip: "8.8.8.8").and_return(
       network_telemetry_status: "skipped",
       network_telemetry_output: "local unavailable",
-      provider_name: "local_traceroute"
+      provider_name: "local_traceroute",
+      payload: { reason: "command_unavailable" }
     )
     allow(globalping_provider).to receive(:call).with(ip: "8.8.8.8").and_return(
       network_telemetry_status: "completed",
       network_telemetry_output: "1 hop\n2 hop",
-      provider_name: "globalping"
+      provider_name: "globalping",
+      payload: { measurement_id: "m-1" }
     )
     allow(security_event_network_telemetry_result_repository).to receive(:save_result!)
     allow(security_event_repository).to receive(:update_network_telemetry_summary!)
@@ -94,13 +100,15 @@ RSpec.describe SentinelTracker::SecurityEvents::TelemetryCollector do
       security_event_id: 11,
       provider_name: "local_traceroute",
       status: "skipped",
-      output: "local unavailable"
+      output: "local unavailable",
+      payload: { reason: "command_unavailable" }
     )
     expect(security_event_network_telemetry_result_repository).to have_received(:save_result!).with(
       security_event_id: 11,
       provider_name: "globalping",
       status: "completed",
-      output: "1 hop\n2 hop"
+      output: "1 hop\n2 hop",
+      payload: { measurement_id: "m-1" }
     )
     expect(security_event_repository).to have_received(:update_network_telemetry_summary!).with(
       security_event_id: 11,

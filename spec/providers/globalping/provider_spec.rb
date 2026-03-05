@@ -16,6 +16,7 @@ RSpec.describe SentinelTracker::Providers::Globalping::Provider do
   let(:measurement_type) { "traceroute" }
   let(:poll_interval_seconds) { 1 }
   let(:max_polls) { 3 }
+  let(:request) { Struct.new(:headers, :body).new({}, nil) }
 
   it "создаёт measurement и возвращает rawOutput после polling" do
     create_response = instance_double(Faraday::Response, body: { "id" => "measurement-1", "status" => "in-progress" })
@@ -34,24 +35,29 @@ RSpec.describe SentinelTracker::Providers::Globalping::Provider do
       }
     )
 
-    allow(connection).to receive(:post).with(
-      "v1/measurements",
-      hash_including("target" => "8.8.8.8", "type" => "traceroute", "limit" => 1, "locations" => [])
-    ).and_return(create_response)
+    allow(connection).to receive(:post).with("v1/measurements").and_yield(request).and_return(create_response)
     allow(connection).to receive(:get).with("v1/measurements/measurement-1").and_return(poll_response)
 
     expect(provider.call(ip: "8.8.8.8")).to eq(
       network_telemetry_status: "completed",
       network_telemetry_output: "1 203.0.113.1\n2 8.8.8.8",
-      provider_name: "globalping"
+      provider_name: "globalping",
+      payload: {
+        measurement_id: "measurement-1",
+        measurement_status: "finished",
+        results_count: 1
+      }
     )
+    expect(request.headers["Content-Type"]).to eq("application/json")
+    expect(JSON.parse(request.body)).to include("target" => "8.8.8.8", "type" => "traceroute", "limit" => 1, "locations" => [])
   end
 
   it "возвращает skipped для локального ip" do
     expect(provider.call(ip: "127.0.0.1")).to eq(
       network_telemetry_status: "skipped",
       network_telemetry_output: "globalping network telemetry skipped for non-public ip",
-      provider_name: "globalping"
+      provider_name: "globalping",
+      payload: { reason: "non_public_ip" }
     )
   end
 
@@ -62,7 +68,8 @@ RSpec.describe SentinelTracker::Providers::Globalping::Provider do
     expect(provider.call(ip: "8.8.8.8")).to eq(
       network_telemetry_status: "failed",
       network_telemetry_output: "StandardError: globalping api error: limit exceeded",
-      provider_name: "globalping"
+      provider_name: "globalping",
+      payload: { reason: "exception" }
     )
   end
 end

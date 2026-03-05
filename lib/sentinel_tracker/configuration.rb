@@ -29,6 +29,12 @@ module SentinelTracker
     # @return [Hash]
     attr_accessor :security_event_enrichment_provider_options
     ##
+    # @return [String]
+    attr_accessor :client_device_enrichment_provider_name
+    ##
+    # @return [Hash]
+    attr_accessor :client_device_enrichment_provider_options
+    ##
     # @return [Array<String>]
     attr_accessor :network_telemetry_provider_names
     ##
@@ -42,6 +48,7 @@ module SentinelTracker
       apply_base_defaults
       apply_target_matching_defaults
       apply_security_event_enrichment_defaults
+      apply_client_device_enrichment_defaults
       apply_network_telemetry_defaults
     end
 
@@ -75,6 +82,13 @@ module SentinelTracker
     def apply_security_event_enrichment_defaults
       @security_event_enrichment_provider_name = "ip_api"
       @security_event_enrichment_provider_options = {}
+    end
+
+    ##
+    # @return [void]
+    def apply_client_device_enrichment_defaults
+      @client_device_enrichment_provider_name = "user_agent_parser"
+      @client_device_enrichment_provider_options = {}
     end
 
     ##

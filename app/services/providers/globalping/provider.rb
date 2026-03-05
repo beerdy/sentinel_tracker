@@ -40,15 +40,15 @@ module SentinelTracker
         # @param ip [String, nil]
         # @return [Hash]
         def call(ip:)
-          return skipped_result("globalping network telemetry skipped for non-public ip") unless SentinelTracker::Shared::PublicIpGuard.public?(ip: ip)
+          return skipped_result("globalping network telemetry skipped for non-public ip", payload: { reason: "non_public_ip" }) unless SentinelTracker::Shared::PublicIpGuard.public?(ip: ip)
 
           measurement_id = create_measurement(ip: ip)
-          return failed_result("globalping measurement id missing") if measurement_id.nil?
+          return failed_result("globalping measurement id missing", payload: { reason: "missing_measurement_id" }) if measurement_id.nil?
 
           poll_measurement(measurement_id: measurement_id)
         rescue StandardError => error
           logger.warn("[sentinel_tracker] globalping failed for #{ip}: #{error.class}: #{error.message}")
-          failed_result("#{error.class}: #{error.message}")
+          failed_result("#{error.class}: #{error.message}", payload: { reason: "exception" })
         end
 
         ##
@@ -63,7 +63,10 @@ module SentinelTracker
         # @param ip [String]
         # @return [String, nil]
         def create_measurement(ip:)
-          response = connection.post("v1/measurements", create_payload(ip: ip))
+          response = connection.post("v1/measurements") do |request|
+            request.headers["Content-Type"] = "application/json"
+            request.body = JSON.generate(create_payload(ip: ip))
+          end
           body = normalize_body(response.body)
           raise_api_error(body)
 
@@ -80,12 +83,18 @@ module SentinelTracker
             raise_api_error(body)
 
             status = body["status"].to_s
-            return completed_result(body) unless in_progress_status?(status)
+            return completed_result(body, measurement_id: measurement_id) unless in_progress_status?(status)
 
             sleep(poll_interval_seconds) if index < max_polls - 1
           end
 
-          failed_result("globalping polling timeout after #{max_polls} polls")
+          failed_result(
+            "globalping polling timeout after #{max_polls} polls",
+            payload: {
+              measurement_id: measurement_id,
+              reason: "polling_timeout"
+            }
+          )
         end
 
         ##
@@ -110,14 +119,19 @@ module SentinelTracker
         ##
         # @param body [Hash]
         # @return [Hash]
-        def completed_result(body)
+        def completed_result(body, measurement_id:)
           raw_output = extract_raw_output(body)
-          return failed_result("globalping results missing rawOutput") if raw_output.nil?
+          return failed_result("globalping results missing rawOutput", payload: { measurement_id: measurement_id, reason: "missing_raw_output" }) if raw_output.nil?
 
           {
             network_telemetry_status: "completed",
             network_telemetry_output: raw_output,
-            provider_name: provider_name
+            provider_name: provider_name,
+            payload: {
+              measurement_id: measurement_id,
+              measurement_status: body["status"],
+              results_count: body.fetch("results", []).is_a?(Array) ? body.fetch("results", []).size : 0
+            }
           }
         end
 
@@ -160,22 +174,25 @@ module SentinelTracker
         ##
         # @param message [String]
         # @return [Hash]
-        def skipped_result(message)
+        def skipped_result(message, payload: {})
           {
             network_telemetry_status: "skipped",
             network_telemetry_output: message,
-            provider_name: provider_name
+            provider_name: provider_name,
+            payload: payload
           }
         end
 
         ##
         # @param message [String]
+        # @param payload [Hash]
         # @return [Hash]
-        def failed_result(message)
+        def failed_result(message, payload: {})
           {
             network_telemetry_status: "failed",
             network_telemetry_output: message,
-            provider_name: provider_name
+            provider_name: provider_name,
+            payload: payload
           }
         end
       end
