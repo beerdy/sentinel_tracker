@@ -38,8 +38,7 @@ module SentinelTracker
       payload = request_context_extractor.call(request: request)
 
       response = app.call(env)
-      match = target_matcher.call(request: request)
-      enqueue_event(payload, match) if match
+      safely_enqueue_event(payload: payload, request: request)
       response
     rescue StandardError => error
       log_error(error)
@@ -54,6 +53,17 @@ module SentinelTracker
     # @return [void]
     def enqueue_event(payload, match)
       SentinelTracker::SecurityEvents::PersistJob.perform_later(payload.merge(match))
+    end
+
+    ##
+    # @param payload [Hash]
+    # @param request [ActionDispatch::Request]
+    # @return [void]
+    def safely_enqueue_event(payload:, request:)
+      match = target_matcher.call(request: request)
+      enqueue_event(payload, match) if match
+    rescue StandardError => error
+      log_error(error)
     end
 
     ##

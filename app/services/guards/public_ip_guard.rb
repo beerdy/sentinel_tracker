@@ -3,7 +3,7 @@ module SentinelTracker
     ##
     # Проверяет, является ли IP публичным и пригодным для внешней телеметрии.
     class PublicIpGuard
-      PRIVATE_NETWORKS = [
+      PRIVATE_NETWORKS ||= [
         IPAddr.new("10.0.0.0/8"),
         IPAddr.new("127.0.0.0/8"),
         IPAddr.new("169.254.0.0/16"),

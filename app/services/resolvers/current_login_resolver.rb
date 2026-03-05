@@ -3,7 +3,7 @@ module SentinelTracker
     ##
     # Универсальный resolver текущего login для host-приложений.
     class CurrentLoginResolver
-      TOKEN_SEPARATOR = "_".freeze
+      TOKEN_SEPARATOR ||= "_".freeze
 
       ##
       # @param request [ActionDispatch::Request]

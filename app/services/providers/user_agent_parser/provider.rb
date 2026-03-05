@@ -4,8 +4,8 @@ module SentinelTracker
       ##
       # Client device enrichment provider на базе user-agent строки.
       class Provider
-        PROVIDER_NAME = "user_agent_parser".freeze
-        UNKNOWN = "unknown".freeze
+        PROVIDER_NAME ||= "user_agent_parser".freeze
+        UNKNOWN ||= "unknown".freeze
 
         ##
         # @return [Integer]

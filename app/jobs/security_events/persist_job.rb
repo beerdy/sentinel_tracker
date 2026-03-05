@@ -3,7 +3,7 @@ module SentinelTracker
     ##
     # Асинхронно обрабатывает захваченный request context.
     class PersistJob < ApplicationJob
-      queue_as :default
+      queue_as :sentinel_tracker
 
       ##
       # @param payload [Hash]

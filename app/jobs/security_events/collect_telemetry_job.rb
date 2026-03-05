@@ -3,7 +3,7 @@ module SentinelTracker
     ##
     # Выполняет сбор network telemetry для уже сохранённого события безопасности.
     class CollectTelemetryJob < ApplicationJob
-      queue_as :default
+      queue_as :sentinel_tracker
 
       ##
       # @param security_event_id [Integer]

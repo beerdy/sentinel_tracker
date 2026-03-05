@@ -4,10 +4,10 @@ module SentinelTracker
       ##
       # Собирает безопасную argv-команду для local_traceroute provider.
       class CommandBuilder
-        TRACEROUTE_QUERY_COUNT = "1".freeze
-        TRACEROUTE_MAX_TTL = "8".freeze
-        DEFAULT_COMMAND_PATH = "/usr/sbin/traceroute".freeze
-        FALLBACK_COMMAND_PATHS = ["/usr/sbin/traceroute", "/usr/bin/traceroute", "/bin/traceroute"].freeze
+        TRACEROUTE_QUERY_COUNT ||= "1".freeze
+        TRACEROUTE_MAX_TTL ||= "8".freeze
+        DEFAULT_COMMAND_PATH ||= "/usr/sbin/traceroute".freeze
+        FALLBACK_COMMAND_PATHS ||= ["/usr/sbin/traceroute", "/usr/bin/traceroute", "/bin/traceroute"].freeze
 
         ##
         # @return [String]

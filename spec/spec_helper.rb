@@ -1,4 +1,5 @@
 require "bundler/setup"
+require "logger"
 require "active_job"
 require "sentinel_tracker"
 

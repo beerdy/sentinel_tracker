@@ -3,7 +3,7 @@ module SentinelTracker
     module ClientDevice
       # Канонический контракт client device enrichment для всех provider-ов роли.
       module Schema
-        STRING_FIELDS = %w[
+        STRING_FIELDS ||= %w[
           device_type
           device_vendor
           device_model
@@ -17,7 +17,7 @@ module SentinelTracker
           fingerprint_hash
         ].freeze
 
-        INTEGER_FIELDS = %w[
+        INTEGER_FIELDS ||= %w[
           screen_width
           screen_height
           hardware_concurrency
@@ -25,9 +25,9 @@ module SentinelTracker
           touch_points
         ].freeze
 
-        BOOLEAN_FIELDS = %w[bot].freeze
-        PAYLOAD_FIELD = "payload".freeze
-        ALL_FIELDS = (STRING_FIELDS + INTEGER_FIELDS + BOOLEAN_FIELDS).freeze
+        BOOLEAN_FIELDS ||= %w[bot].freeze
+        PAYLOAD_FIELD ||= "payload".freeze
+        ALL_FIELDS ||= (STRING_FIELDS + INTEGER_FIELDS + BOOLEAN_FIELDS).freeze
 
         module_function
 

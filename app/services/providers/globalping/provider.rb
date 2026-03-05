@@ -4,7 +4,7 @@ module SentinelTracker
       ##
       # Network telemetry provider на базе Globalping REST API.
       class Provider
-        PROVIDER_NAME = "globalping".freeze
+        PROVIDER_NAME ||= "globalping".freeze
         ##
         # @return [Faraday::Connection]
         attr_reader :connection

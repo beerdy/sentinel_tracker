@@ -4,10 +4,10 @@ module SentinelTracker
       ##
       # Client device enrichment provider на базе payload, присланного с фронтенда.
       class Provider
-        PROVIDER_NAME = "client_payload".freeze
-        ALLOWED_STRING_FIELDS = SentinelTracker::Providers::ClientDevice::Schema::STRING_FIELDS
-        ALLOWED_INTEGER_FIELDS = SentinelTracker::Providers::ClientDevice::Schema::INTEGER_FIELDS
-        MAX_INTEGER_VALUE = 1_000_000
+        PROVIDER_NAME ||= "client_payload".freeze
+        ALLOWED_STRING_FIELDS ||= SentinelTracker::Providers::ClientDevice::Schema::STRING_FIELDS
+        ALLOWED_INTEGER_FIELDS ||= SentinelTracker::Providers::ClientDevice::Schema::INTEGER_FIELDS
+        MAX_INTEGER_VALUE ||= 1_000_000
 
         ##
         # @return [Integer]

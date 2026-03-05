@@ -4,7 +4,7 @@ module SentinelTracker
       ##
       # Локальный network telemetry provider на базе traceroute.
       class Provider
-        PROVIDER_NAME = "local_traceroute".freeze
+        PROVIDER_NAME ||= "local_traceroute".freeze
         ##
         # @return [SentinelTracker::Providers::LocalTraceroute::CommandBuilder]
         attr_reader :network_telemetry_command_builder

@@ -7,8 +7,8 @@ module SentinelTracker
       ##
       # Запускает local_traceroute command с таймаутом и ограничением вывода.
       class CommandRunner
-        DEFAULT_TIMEOUT_SECONDS = 15
-        DEFAULT_MAX_OUTPUT_LENGTH = 20_000
+        DEFAULT_TIMEOUT_SECONDS ||= 15
+        DEFAULT_MAX_OUTPUT_LENGTH ||= 20_000
         ##
         # @return [Integer]
         attr_reader :timeout_seconds

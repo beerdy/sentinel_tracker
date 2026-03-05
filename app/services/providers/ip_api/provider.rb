@@ -4,8 +4,8 @@ module SentinelTracker
       ##
       # IP enrichment provider на базе ip-api.com.
       class Provider
-        FIELDS = "status,message,as,isp,proxy,country,city".freeze
-        PROVIDER_NAME = "ip_api".freeze
+        FIELDS ||= "status,message,as,isp,proxy,country,city".freeze
+        PROVIDER_NAME ||= "ip_api".freeze
 
         ##
         # @return [Faraday::Connection]

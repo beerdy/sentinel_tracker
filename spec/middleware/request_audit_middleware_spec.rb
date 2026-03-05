@@ -86,4 +86,32 @@ RSpec.describe SentinelTracker::RequestAuditMiddleware do
 
     expect(response.first).to eq(200)
   end
+
+  it "не вызывает host-приложение повторно при ошибке matcher" do
+    app_call_count = 0
+    app_with_counter = lambda do |_env|
+      app_call_count += 1
+      [200, { "Content-Type" => "text/plain" }, ["ok"]]
+    end
+    middleware_with_counter = described_class.new(
+      app_with_counter,
+      request_context_extractor: request_context_extractor,
+      target_matcher: target_matcher,
+      logger: logger
+    )
+    allow(request_context_extractor).to receive(:call).and_return(
+      request_method: "GET",
+      request_path: "/profile",
+      ip: "127.0.0.1",
+      x_forwarded_for: nil,
+      user_agent: nil,
+      request_uuid: nil,
+      params: {}
+    )
+    allow(target_matcher).to receive(:call).and_raise(StandardError, "matcher failed")
+
+    middleware_with_counter.call(env)
+
+    expect(app_call_count).to eq(1)
+  end
 end

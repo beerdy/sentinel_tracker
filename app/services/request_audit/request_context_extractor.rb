@@ -2,9 +2,9 @@ module SentinelTracker
   ##
   # Извлекает безопасный контекст запроса для дальнейшего аудита.
   class RequestContextExtractor
-    FILTERED_VALUE = "[FILTERED]".freeze
-    MAX_STRING_LENGTH = 2_000
-    FILTERED_KEYS = %w[
+    FILTERED_VALUE ||= "[FILTERED]".freeze
+    MAX_STRING_LENGTH ||= 2_000
+    FILTERED_KEYS ||= %w[
       password
       password_confirmation
       token
