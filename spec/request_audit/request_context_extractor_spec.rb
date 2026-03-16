@@ -20,6 +20,7 @@ RSpec.describe SentinelTracker::RequestContextExtractor do
 
     payload = extractor.call(request: request)
 
+    expect(payload[:occurred_at]).to be_present
     expect(payload[:request_method]).to eq("POST")
     expect(payload[:request_path]).to include("/logins")
     expect(payload[:ip]).to eq("203.0.113.5")

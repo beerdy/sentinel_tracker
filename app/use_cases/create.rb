@@ -43,6 +43,7 @@ module SentinelTracker
         params_json_patch = enrichment_attributes.delete(:params_json_patch)
 
         {
+          occurred_at: normalize_occurred_at(payload[:occurred_at]),
           target_user_id: payload[:target_user_id],
           target_login: payload[:target_login],
           request_uuid: payload[:request_uuid],
@@ -93,6 +94,17 @@ module SentinelTracker
       rescue StandardError => error
         logger.warn("[sentinel_tracker] persistence unavailable: #{error.class}: #{error.message}")
         false
+      end
+
+      ##
+      # @param value [String, Time, nil]
+      # @return [Time]
+      def normalize_occurred_at(value)
+        return value if value.respond_to?(:to_time)
+
+        Time.zone.parse(value.to_s)
+      rescue StandardError
+        Time.current
       end
     end
   end

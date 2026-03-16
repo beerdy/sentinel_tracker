@@ -14,6 +14,7 @@ RSpec.describe SentinelTracker::SecurityEvents::Create do
   let(:pipeline) { instance_double(SentinelTracker::SecurityEvents::Pipeline) }
   let(:payload) do
     {
+      occurred_at: "2026-03-16T12:00:00.000000Z",
       target_user_id: 42,
       target_login: "watch@example.com",
       request_uuid: "uuid-1",
@@ -46,6 +47,7 @@ RSpec.describe SentinelTracker::SecurityEvents::Create do
       attributes: hash_including(
         target_user_id: 42,
         target_login: "watch@example.com",
+        occurred_at: Time.utc(2026, 3, 16, 12, 0, 0),
         ip: "8.8.8.8",
         asn: "AS15169 Google LLC",
         isp: "Google LLC",

@@ -19,6 +19,7 @@ module SentinelTracker
     # @return [Hash]
     def call(request:)
       {
+        occurred_at: Time.current.iso8601(6),
         request_uuid: request_uuid(request),
         request_method: request.request_method,
         request_path: request.fullpath,
